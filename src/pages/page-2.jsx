@@ -1,9 +1,20 @@
-import { StaticImage } from 'gatsby-plugin-image';
+import { graphql, useStaticQuery } from 'gatsby';
+import { StaticImage, GatsbyImage, getImage } from 'gatsby-plugin-image';
 import React, { useState } from 'react';
 
 import Link from 'components/shared/link';
 
 const Page2 = () => {
+  const { image } = useStaticQuery(graphql`
+    query {
+      image: file(relativePath: { eq: "test-4.jpeg" }) {
+        childImageSharp {
+          gatsbyImageData(width: 300)
+        }
+      }
+    }
+  `);
+  const image2 = getImage(image);
   const [message1, setMessage1] = useState('on load failed');
   const [message2, setMessage2] = useState('on load failed');
   const [message3, setMessage3] = useState('on load failed');
@@ -25,11 +36,14 @@ const Page2 = () => {
         <div>{new Date().toLocaleString()}</div>
         <div>{message1}</div>
         <div>
-          <StaticImage
+          <GatsbyImage
+            image={image2}
             alt="Example static image"
-            src="../images/test-4.jpeg"
             onLoad={() => {
               setMessage2('on load triggered');
+            }}
+            onStartLoad={({ wasCached }) => {
+              console.log('on start load image 1', wasCached);
             }}
           />
         </div>
